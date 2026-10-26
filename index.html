@@ -565,6 +565,28 @@
 }
 
   </style>
+  
+.launch-offer-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.launch-offer-old-price {
+  color: #58705c;
+  font-size: 14px;
+  text-decoration: line-through;
+}
+
+.launch-offer-new-price {
+  color: #204b38;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
 </head>
 
 <body>
@@ -582,6 +604,26 @@
   </header>
 
   <main>
+    
+<div class="launch-offer">
+  <span class="launch-offer-tag">FOUNDING CUSTOMER OFFER</span>
+  <div class="launch-offer-content">
+    <strong>Save 10% as one of our first 100 customers</strong>
+    <p>
+      Get The Costume Department for €26.10 per month
+      instead of €29 per month.
+    </p>
+    <div class="launch-offer-price">
+      <span class="launch-offer-old-price">€29/month</span>
+      <span class="launch-offer-new-price">€26.10/month</span>
+    </div>
+    <span class="launch-offer-note">
+      Save €2.90 every month. Introductory offer for the first
+      100 eligible customers, subject to availability.
+    </span>
+  </div>
+</div>
+
     <section class="hero">
       <div class="wrap hero-grid">
         <div>
