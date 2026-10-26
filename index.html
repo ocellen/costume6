@@ -1,2048 +1,861 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#202c3b">
-<title>WardrobeFlow | Costume Hire Management</title>
-
-<style>
-
-:root {
-  /* Main brand colours */
-  --navy: #204b38;
-  --gold: #c4d9c5;
-
-  /* Page and surface colours */
-  --bg: #f3f7f3;
-  --paper: #ffffff;
-  --ink: #23372c;
-  --muted: #718176;
-  --line: #dce7dd;
-
-  /* Green status colours */
-  --green: #26734d;
-  --green-bg: #e4f3e8;
-
-  /* Keep warning and error states distinct */
-  --amber: #8a5700;
-  --amber-bg: #fff2d5;
-  --red: #b42318;
-  --red-bg: #fde8e7;
-
-  /* Informational status */
-  --blue: #2866a3;
-  --blue-bg: #e8f1fc;
-}
-
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font: 15px/1.5 system-ui, -apple-system, sans-serif;
-}
-
-button, input, select, textarea { font: inherit; }
-button { cursor: pointer; }
-button:focus-visible, input:focus-visible,
-select:focus-visible, textarea:focus-visible {
-  outline: 3px solid #75a8ef;
-  outline-offset: 2px;
-}
-
-.topbar {
-  background: var(--navy);
-  color: white;
-  padding: 14px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.brand { display: flex; align-items: center; gap: 11px; }
-.logo {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: var(--gold);
-  color: var(--navy);
-  display: grid;
-  place-items: center;
-  font-size: 24px;
-}
-.brand h1 { font-size: 20px; margin: 0; }
-.brand small {
-  display: block;
-  color: var(--gold);
-  font-size: 10px;
-  letter-spacing: 1px;
-}
-
-.sample-pill {
-  background: #fff0cc;
-  color: #694700;
-  border-radius: 99px;
-  padding: 6px 9px;
-  font-size: 10px;
-  font-weight: 850;
-  white-space: nowrap;
-}
-
-.layout { display: flex; min-height: calc(100vh - 70px); }
-
-
-.sidebar {
-  width: 215px;
-  flex-shrink: 0;
-  background: white;
-  border-right: 1px solid var(--line);
-  padding: 20px 12px;
-
-  /* Keep the sidebar visible while scrolling */
-  position: sticky;
-  top: 70px;
-  height: calc(100vh - 70px);
-  align-self: flex-start;
-  overflow-y: auto;
-}
-
-
-.nav-label {
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  padding: 10px;
-}
-
-.nav-button {
-  width: 100%;
-  display: flex;
-  gap: 11px;
-  align-items: center;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-  color: #657186;
-  padding: 12px;
-  margin-bottom: 4px;
-  text-align: left;
-  font-weight: 650;
-}
-.nav-button.active {
-  background: #e9edf3;
-  color: var(--navy);
-}
-
-.nav-icon { width: 24px; font-size: 19px; text-align: center; }
-
-main {
-  flex: 1;
-  min-width: 0;
-  padding: 28px clamp(14px, 3vw, 36px) 100px;
-}
-
-.page { display: none; max-width: 1050px; margin: auto; }
-.page.active { display: block; }
-
-.page-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 22px;
-}
-
-h2 { font-size: clamp(24px, 3vw, 31px); margin: 0 0 7px; line-height: 1.2; }
-h3 { font-size: 17px; margin: 0; }
-p { margin: 0; }
-.muted { color: var(--muted); }
-.small { font-size: 12px; }
-.eyebrow {
-  font-size: 10px;
-  letter-spacing: 1.1px;
-  font-weight: 850;
-  color: var(--muted);
-  margin-bottom: 7px;
-}
-
-.card {
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 18px;
-  margin-bottom: 16px;
-  box-shadow: 0 5px 24px #18273a08;
-}
-
-.card-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-.item-photo {
-  flex-shrink: 0;
-  width: 56px;
-  height: 68px;
-  object-fit: cover;
-  object-position: center;
-  border-radius: 8px;
-  background: #edf4ed;
-  display: block;
-}
-  
-.detail-photo {
-  width: 100%;
-  max-height: 380px;
-  aspect-ratio: 4 / 5;
-  object-fit: contain;
-  object-position: center;
-  display: block;
-  margin-bottom: 12px;
-  padding: 10px;
-  background: #edf4ed;
-  border-radius: 12px;
-}
-
-.metrics {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.metric {
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 15px;
-  padding: 15px;
-}
-.metric-icon {
-  font-size: 22px;
-  background: #f0f2f5;
-  border-radius: 10px;
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  margin-bottom: 12px;
-}
-.metric-value { font-size: 29px; font-weight: 800; }
-.metric-label { font-size: 12px; font-weight: 700; }
-.metric-foot { font-size: 11px; color: var(--muted); margin-top: 4px; }
-
-.columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.stack { display: grid; gap: 12px; }
-.row { display: flex; align-items: center; gap: 12px; }
-.between { justify-content: space-between; }
-.flex1 { flex: 1; min-width: 0; }
-
-.btn {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  gap: 7px;
-  border: 1px solid var(--line);
-  background: white;
-  color: var(--ink);
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 700;
-}
-.btn.primary { background: var(--navy); color: white; border-color: var(--navy); }
-.btn.full { width: 100%; }
-.btn.sm { padding: 7px 10px; font-size: 12px; }
-
-.field { display: grid; gap: 6px; }
-.field label { font-size: 12px; font-weight: 750; }
-
-input, select, textarea {
-  width: 100%;
-  min-width: 0;
-  border: 1px solid #d8dee7;
-  border-radius: 10px;
-  padding: 11px 12px;
-  background: white;
-  color: var(--ink);
-}
-textarea { min-height: 85px; resize: vertical; }
-
-.toolbar { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 15px; }
-.toolbar .search { flex: 1; min-width: 160px; }
-
-.badge {
-  display: inline-flex;
-  padding: 5px 9px;
-  border-radius: 99px;
-  font-size: 11px;
-  font-weight: 800;
-  white-space: nowrap;
-}
-.b-available { background: var(--green-bg); color: var(--green); }
-.b-hire { background: var(--blue-bg); color: var(--blue); }
-.b-clean { background: var(--amber-bg); color: var(--amber); }
-.b-repair { background: var(--red-bg); color: var(--red); }
-.b-neutral { background: #edf0f4; color: #596578; }
-
-.record-list { display: grid; gap: 9px; }
-  
-.inventory-record-group {
-  display: grid;
-  gap: 0;
-}
-
-.inventory-record-group .record {
-  border-radius: 13px 13px 0 0;
-}
-
-.inventory-ready {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 10px 13px;
-  margin-bottom: 9px;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-top: 0;
-  border-radius: 0 0 13px 13px;
-  font-size: 12px;
-  color: var(--green);
-}
-
-.inventory-ready input {
-  width: 18px;
-  height: 18px;
-  margin: 0;
-  accent-color: var(--green);
-  flex-shrink: 0;
-}
-
-.record {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 13px;
-  padding: 13px;
-  min-width: 0;
-}
-.record-main { flex: 1; min-width: 0; }
-.record-title { font-weight: 750; font-size: 14px; overflow-wrap: anywhere; }
-.record-meta { color: var(--muted); font-size: 12px; margin-top: 3px; }
-.record-side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-.item-icon {
-  flex-shrink: 0;
-  width: 43px;
-  height: 43px;
-  border-radius: 11px;
-  background: #eef0f3;
-  display: grid;
-  place-items: center;
-  font-size: 23px;
-}
-
-.rule { height: 1px; background: var(--line); margin: 12px 0; }
-.alert { padding: 12px; border-radius: 10px; font-size: 13px; }
-.alert.info { background: var(--blue-bg); color: #254f83; }
-.alert.good { background: var(--green-bg); color: var(--green); }
-.alert.warn { background: var(--amber-bg); color: var(--amber); }
-.alert.bad { background: var(--red-bg); color: var(--red); }
-
-.progress { height: 7px; background: #edf0f4; border-radius: 99px; overflow: hidden; }
-.progress span { display: block; height: 100%; background: var(--green); }
-
-.check-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
-}
-.check-row input { width: 19px; margin-top: 3px; accent-color: var(--green); }
-
-.condition-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 11px;
-}
-
-.condition-option {
-  position: relative;
-  width: 100%;
-  min-height: 110px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  text-align: left;
-  padding: 16px;
-  border: 2px solid var(--option-border);
-  border-radius: 14px;
-  background: var(--option-bg);
-  color: var(--option-color);
-}
-.condition-option.selected {
-  border-color: var(--option-color);
-  box-shadow: 0 0 0 2px var(--option-bg);
-}
-.condition-option strong { display: block; font-size: 14px; }
-.condition-option .desc { display: block; font-size: 12px; margin-top: 5px; }
-.condition-symbol { font-size: 24px; }
-.condition-check { position: absolute; right: 11px; top: 9px; }
-
-.option-green {
-  --option-color: var(--green);
-  --option-bg: var(--green-bg);
-  --option-border: #b3dfbd;
-}
-.option-amber {
-  --option-color: var(--amber);
-  --option-bg: var(--amber-bg);
-  --option-border: #ead29b;
-}
-.option-red {
-  --option-color: var(--red);
-  --option-bg: var(--red-bg);
-  --option-border: #eab5b0;
-}
-
-.scan-box {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 15px;
-  border: 1px dashed #b8c3d0;
-  border-radius: 13px;
-  background: #f4f6f8;
-}
-
-.empty { text-align: center; padding: 25px; color: var(--muted); }
-.footer-note { font-size: 11px; color: var(--muted); margin-top: 20px; }
-
-.mobile-nav { display: none; }
-
-@media (max-width: 850px) {
-  .sidebar { width: 175px; }
-  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .columns { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 600px) {
-  .topbar { padding: 12px; }
-  .brand h1 { font-size: 18px; }
-  .brand small { font-size: 9px; }
-  .logo { width: 37px; height: 37px; }
-  .sample-pill { font-size: 9px; padding: 6px; }
-  .sidebar { display: none; }
-  main { padding: 22px 13px 100px; }
-  .metrics { gap: 9px; }
-  .metric { padding: 12px; }
-  .metric-value { font-size: 26px; }
-  .card { padding: 14px; }
-  .condition-grid { grid-template-columns: 1fr; }
-  .condition-option { min-height: 85px; padding: 14px; }
-  .mobile-nav {
-    position: fixed;
-    z-index: 20;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-around;
-    background: white;
-    border-top: 1px solid var(--line);
-    padding: 7px 3px max(8px, env(safe-area-inset-bottom));
-  }
-  .mobile-nav button {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    padding: 6px 2px;
-    border: 0;
-    border-radius: 9px;
-    background: transparent;
-    color: var(--muted);
-    font-size: 9px;
-    font-weight: 750;
-  }
-  .mobile-nav button span:first-child { font-size: 19px; }
-  .mobile-nav button.active { background: #edf0f4; color: var(--navy); }
-  .toolbar > * { min-width: 0; }
-}
-
-/* ===== Forest green theme refinements ===== */
-
-/* Active desktop navigation */
-.nav-button.active {
-  background: #e4f0e6;
-  color: var(--navy);
-}
-
-/* Active mobile navigation */
-.mobile-nav button.active {
-  background: #e4f0e6;
-  color: var(--navy);
-}
-
-/* Logo and accent details */
-.logo {
-  background: var(--gold);
-  color: var(--navy);
-}
-
-.brand small {
-  color: #c4d9c5;
-}
-
-/* Softer green sample-data labels */
-.sample-pill {
-  background: #e4f0e6;
-  color: #28583b;
-}
-
-/* Inventory and dashboard icon backgrounds */
-.metric-icon,
-.item-icon {
-  background: #edf4ed;
-}
-
-/* Barcode scanner panel */
-.scan-box {
-  background: #f0f6f0;
-  border-color: #b9cdbb;
-}
-
-/* Keyboard focus accessibility */
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline-color: #39845a;
-}
-
-/* Smooth transitions for interactive elements */
-.btn,
-.nav-button,
-.mobile-nav button {
-  transition: background-color 0.2s ease,
-              color 0.2s ease,
-              border-color 0.2s ease;
-}
-
-.btn.primary:hover {
-  background: #183c2b;
-  border-color: #183c2b;
-}
-
-</style>
-</head>
-<body>
-<div class="app">
-
-<header class="topbar">
-  <div class="brand">
-    <div class="logo">👑</div>
-    <div>
-      <h1>WardrobeFlow</h1>
-      <small>COSTUME HIRE OPERATIONS</small>
-    </div>
-  </div>
-  <span class="sample-pill">SAMPLE DATA</span>
-</header>
-
-<div class="layout">
-  <aside class="sidebar">
-    <div class="nav-label">WORKSPACE</div>
-    <div id="sideNav"></div>
-    <div class="alert warn" style="margin-top:24px">
-      <strong>Demo environment</strong>
-      <p style="margin-top:5px">All records are fictional.</p>
-    </div>
-  </aside>
-
-  <main>
-
-<section id="overview" class="page active">
-  <div class="page-heading">
-    <div>
-      <div class="eyebrow">COSTUME HIRE MANAGEMENT</div>
-      <h2>Operations overview</h2>
-      <p class="muted">Your wardrobe, at a glance.</p>
-    </div>
-    <span class="sample-pill">SAMPLE DATA</span>
-  </div>
-  <div id="metrics" class="metrics"></div>
-  <div class="columns">
-    <div class="card">
-      <div class="card-title"><h3>Today's priorities</h3></div>
-      <div id="priorities" class="stack"></div>
-    </div>
-    <div class="card">
-      <div class="card-title"><h3>Inventory health</h3></div>
-      <div id="health" class="stack"></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-title">
-      <h3>Recently tracked items</h3>
-      <button class="btn sm" onclick="navigate('inventory')">View all →</button>
-    </div>
-    <div id="recent" class="record-list"></div>
-  </div>
-</section>
-
-<section id="inventory" class="page">
-  <div class="page-heading">
-    <div>
-      <div class="eyebrow">STOCK CONTROL</div>
-      <h2>Costume inventory</h2>
-      <p class="muted">Search and manage individual costume records.</p>
-    </div>
-  </div>
-  <div class="toolbar">
-    <input class="search" id="inventorySearch"
-      placeholder="Search name or barcode..."
-      oninput="renderInventory()" aria-label="Search inventory">
-    <select id="inventoryFilter" onchange="renderInventory()"
-      aria-label="Filter inventory">
-      <option value="All">All statuses</option>
-      <option>Available</option>
-      <option>On hire</option>
-      <option>Cleaning</option>
-      <option>Repair</option>
-      <option>Retired</option>
-    </select>
-    <button class="btn primary" onclick="openScanner('inventory')">
-      ▥ Scan barcode
-    </button>
-  </div>
-  <p id="inventoryCount" class="muted small" style="margin-bottom:12px"></p>
-  <div id="inventoryList" class="record-list"></div>
-  <p class="footer-note">SAMPLE DATA — NOT REAL INVENTORY. Barcode IDs are fictional.</p>
-</section>
-
-<section id="bookings" class="page">
-  <div class="page-heading">
-    <div>
-      <div class="eyebrow">CUSTOMERS & SCHEDULING</div>
-      <h2>Hire bookings</h2>
-      <p class="muted">Track dispatch, delivery and return dates.</p>
-    </div>
-    <button class="btn primary" onclick="navigate('newbooking')">＋ New hire</button>
-  </div>
-  <div class="alert info" style="margin-bottom:16px">
-    All customers, productions and dates are fictional examples.
-  </div>
-  <div id="bookingList" class="stack"></div>
-</section>
-
-<section id="dispatch" class="page">
-  <div class="page-heading">
-    <div>
-      <div class="eyebrow">OUTGOING LOGISTICS</div>
-      <h2>Dispatch preparation</h2>
-      <p class="muted">Check every item before it leaves the wardrobe.</p>
-    </div>
-  </div>
-  <div class="card stack">
-    <div class="field">
-      <label for="dispatchBooking">Hire booking</label>
-      <select id="dispatchBooking" onchange="renderDispatch()"></select>
-    </div>
-    <div class="row between">
-      <h3>Packing checklist</h3>
-      <span id="dispatchCount" class="badge b-neutral">0 / 0</span>
-    </div>
-    <div class="progress"><span id="dispatchProgress" style="width:0%"></span></div>
-    <div id="dispatchList"></div>
-    <button class="btn" onclick="openScanner('dispatch')">▥ Scan an item</button>
-    <div class="rule"></div>
-    <div class="field">
-      <label for="dispatchDate">Actual dispatch date</label>
-      <input type="date" id="dispatchDate" value="2026-10-25">
-    </div>
-    <div class="field">
-      <label for="deliveryDate">Expected customer delivery</label>
-      <input type="date" id="deliveryDate" value="2026-10-26">
-    </div>
-    <button id="dispatchConfirm" class="btn primary full"
-      onclick="confirmDispatch()">Confirm simulated dispatch</button>
-    <div id="dispatchMessage" arialive="polite"></div>
-  </div>
-</section>
-
-<section id="condition" class="page">
-  <div class="page-heading">
-    <div>
-      <div class="eyebrow">RETURNS & QUALITY CONTROL</div>
-      <h2>Condition review</h2>
-      <p class="muted">Inspect a returned item and tap its outcome.</p>
-    </div>
-  </div>
-
-  <div class="card stack">
-    <div class="scan-box">
-      <div style="font-size:30px">▥</div>
-      <div class="flex1">
-        <strong>Identify returned costume</strong>
-        <p class="muted small">Select a record or simulate a barcode scan.</p>
-      </div>
-      <button class="btn sm" onclick="openScanner('condition')">Scan</button>
-    </div>
-
-    <div class="field">
-      <label for="conditionItem">Costume / barcode</label>
-      <select id="conditionItem" onchange="loadConditionItem()"></select>
-    </div>
-    <div id="conditionItemInfo" class="alert info"></div>
-    <div class="rule"></div>
-
-    <div>
-      <h3>How is the item?</h3>
-      <p class="muted small" style="margin-top:5px">
-        Select one condition to determine the next action.
-      </p>
-    </div>
-
-    <div class="condition-grid" role="group" aria-label="Condition outcome">
-      <button type="button"
-        class="condition-option option-green selected"
-        data-condition="regular" aria-pressed="true"
-        onclick="chooseCondition('regular')">
-        <span class="condition-symbol">✓</span>
-        <span>
-          <strong>Regular cleaning</strong>
-          <span class="desc">Routine cleaning before the next hire.</span>
-        </span>
-        <span class="condition-check">●</span>
-      </button>
-
-      <button type="button"
-        class="condition-option option-amber"
-        data-condition="additional" aria-pressed="false"
-        onclick="chooseCondition('additional')">
-        <span class="condition-symbol">✦</span>
-        <span>
-          <strong>Additional cleaning</strong>
-          <span class="desc">Extra treatment or stain removal.</span>
-        </span>
-        <span class="condition-check" hidden>●</span>
-      </button>
-
-      <button type="button"
-        class="condition-option option-amber"
-        data-condition="repair" aria-pressed="false"
-        onclick="chooseCondition('repair')">
-        <span class="condition-symbol">⚒</span>
-        <span>
-          <strong>Repair required</strong>
-          <span class="desc">Repair before the next hire.</span>
-        </span>
-        <span class="condition-check" hidden>●</span>
-      </button>
-
-      <button type="button"
-        class="condition-option option-red"
-        data-condition="unsalvageable" aria-pressed="false"
-        onclick="chooseCondition('unsalvageable')">
-        <span class="condition-symbol">⊘</span>
-        <span>
-          <strong>Unsalvageable</strong>
-          <span class="desc">Quarantine pending retirement approval.</span>
-        </span>
-        <span class="condition-check" hidden>●</span>
-      </button>
-    </div>
-
-    <div id="conditionAction" class="alert good" aria-live="polite">
-      Send for routine cleaning before returning to available stock.
-    </div>
-
-    <div class="field">
-      <label for="conditionDate">Date received</label>
-      <input type="date" id="conditionDate" value="2026-10-25">
-    </div>
-    <div class="field">
-      <label for="conditionNotes">Inspection notes (optional)</label>
-      <textarea id="conditionNotes"
-        placeholder="E.g. stain on left sleeve, torn seam, missing button..."></textarea>
-    </div>
-    <div class="field">
-      <label for="inspector">Inspected by</label>
-      <input id="inspector" placeholder="Sample staff member">
-    </div>
-    <button class="btn primary full" onclick="saveInspection()">
-      ✓ Record condition review
-    </button>
-    <div id="conditionMessage" aria-live="polite"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">
-      <h3>Recent inspection history</h3>
-      <span class="sample-pill">SAMPLE DATA</span>
-    </div>
-    <div id="inspectionHistory" class="record-list"></div>
-  </div>
-</section>
-
-<section id="detail" class="page">
-  <div class="page-heading">
-    <div>
-      <div class="eyebrow">SAMPLE INVENTORY RECORD</div>
-      <h2 id="detailTitle">Costume details</h2>
-      <p id="detailSubtitle" class="muted"></p>
-    </div>
-    <button class="btn" onclick="navigate('inventory')">← Inventory</button>
-  </div>
-  <div class="columns">
-    <div class="card stack">
-      <img
-  id="detailImage"
-  class="detail-photo"
-  src=""
-  alt="Costume item"
-  onerror="this.style.display='none';"
->
-      <div id="detailStatus"></div>
-      <h3>Item information</h3>
-      <div id="detailInfo" class="stack"></div>
-      <button class="btn primary full" onclick="goInspect()">Inspect return</button>
-      <button class="btn full" onclick="openScanner('detail')">▥ Simulate barcode scan</button>
-    </div>
-    <div class="card">
-      <h3>Condition history</h3>
-      <p class="muted small" style="margin:7px 0 15px">Sample audit records.</p>
-      <div id="detailHistory" class="record-list"></div>
-    </div>
-  </div>
-</section>
-
-<section id="scanner" class="page">
-  <div class="page-heading">
-    <div>
-      <div class="eyebrow">BARCODE LOOKUP</div>
-      <h2>Scan or enter an ID</h2>
-      <p class="muted">Simulated barcode scanning for this demo.</p>
-    </div>
-  </div>
-  <div class="card stack">
-    <div style="text-align:center;padding:15px">
-      <div style="font-size:50px">▥</div>
-      <h3>Barcode lookup</h3>
-      <p class="muted small" style="margin-top:7px">
-        Example: CST-00124
-      </p>
-    </div>
-    <form class="stack" onsubmit="lookupBarcode(event)">
-      <div class="field">
-        <label for="barcodeInput">Barcode / item ID</label>
-        <input id="barcodeInput" placeholder="CST-00124" required>
-      </div>
-      <button class="btn primary full" type="submit">Find costume</button>
-    </form>
-    <div id="scanResult" aria-live="polite"></div>
-    <p class="muted small">
-      This simulates a scan by matching a typed barcode. Camera scanning
-      is not included in this prototype.
-    </p>
-  </div>
-</section>
-
-<section id="newbooking" class="page">
-  <div class="page-heading">
-    <div>
-      <div class="eyebrow">SCHEDULING</div>
-      <h2>New sample booking</h2>
-      <p class="muted">Create a fictional hire record.</p>
-    </div>
-  </div>
-  <form class="card stack" onsubmit="createBooking(event)">
-    <div class="alert warn">
-      SAMPLE DATA — this booking is fictional and is not sent to a customer.
-    </div>
-    <div class="field">
-      <label for="newClient">Customer / production company</label>
-      <input id="newClient" required placeholder="Example Theatre Company">
-    </div>
-    <div class="field">
-      <label for="newProduction">Production name</label>
-      <input id="newProduction" required placeholder="The Winter Tale">
-    </div>
-    <div class="field">
-      <label for="newDispatch">Planned dispatch date</label>
-      <input id="newDispatch" type="date" value="2026-10-28" required>
-    </div>
-    <div class="field">
-      <label for="newDelivery">Expected delivery date</label>
-      <input id="newDelivery" type="date" value="2026-10-29" required>
-    </div>
-    <div class="field">
-      <label for="newReturn">Contractual return date</label>
-      <input id="newReturn" type="date" value="2026-11-04" required>
-    </div>
-    <div class="field">
-      <label for="newCount">Number of costume items</label>
-      <input id="newCount" type="number" min="1" max="200" value="4" required>
-    </div>
-    <button class="btn primary full" type="submit">Create sample booking</button>
-    <button class="btn full" type="button" onclick="navigate('bookings')">Cancel</button>
-    <div id="newBookingMessage" aria-live="polite"></div>
-  </form>
-</section>
-
-</main>
-</div>
-
-<nav class="mobile-nav" id="mobileNav"></nav>
-<div id="toast" class="alert info"
-     style="display:none;position:fixed;bottom:80px;left:12px;right:12px;z-index:30"
-     role="status"></div>
-
-<script>
-"use strict";
-
-/* =========================================
-   WARDBROBEFLOW — SAMPLE DATA
-   All names, IDs and bookings are fictional.
-   ========================================= */
-
-const NAV = [
-  {id:"overview", label:"Overview", icon:"👗"},
-  {id:"inventory", label:"Inventory", icon:"🧥"},
-  {id:"bookings", label:"Bookings", icon:"🎭"},
-  {id:"dispatch", label:"Dispatch", icon:"🚗"},
-  {id:"condition", label:"Condition", icon:"🧵"}
-];
-
-const inventory = [
-{
-  id:"CST-00124",
-  name:"Victorian Tailcoat",
-  category:"Period costume",
-  size:"M",
-  condition:"Good",
-  status:"On hire",
-  location:"HIRE-041",
-  due:"2026-10-28",
-  image:"https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=300&h=380&q=80"
-},
-  {
-    id:"CST-00125",
-    name:"Regency Waistcoat",
-    category:"Period costume",
-    size:"L",
-    condition:"Excellent",
-    status:"Available",
-    location:"Rack A03",
-    due:""
-  },
-  {
-    id:"CST-00126",
-    name:"Military Dress Jacket",
-    category:"Military",
-    size:"S",
-    condition:"Damaged cuff",
-    status:"Repair",
-    location:"Workshop",
-    due:""
-  },
-  {
-    id:"CST-00127",
-    name:"1920s Evening Dress",
-    category:"Evening wear",
-    size:"S",
-    condition:"Excellent",
-    status:"On hire",
-    location:"HIRE-042",
-    due:"2026-11-03"
-  },
-  {
-    id:"CST-00128",
-    name:"Royal Court Cape",
-    category:"Royal costume",
-    size:"One size",
-    condition:"Needs cleaning",
-    status:"Cleaning",
-    location:"Cleaning room",
-    due:""
-  },
-  {
-    id:"CST-00129",
-    name:"Edwardian Blouse",
-    category:"Period costume",
-    size:"M",
-    condition:"Good",
-    status:"Available",
-    location:"Rack B01",
-    due:""
-  },
-  {
-    id:"CST-00130",
-    name:"Victorian Lace Gloves",
-    category:"Accessories",
-    size:"S",
-    condition:"Good",
-    status:"Available",
-    location:"Drawer C04",
-    due:""
-  },
-  {
-    id:"CST-00131",
-    name:"Leather Stage Boots",
-    category:"Footwear",
-    size:"42",
-    condition:"Good",
-    status:"On hire",
-    location:"HIRE-041",
-    due:"2026-10-28"
-  },
-  {
-    id:"CST-00132",
-    name:"Royal Velvet Doublet",
-    category:"Royal costume",
-    size:"L",
-    condition:"Excellent",
-    status:"Available",
-    location:"Rack D02",
-    due:""
-  },
-  {
-    id:"CST-00133",
-    name:"1950s Circle Skirt",
-    category:"Vintage",
-    size:"M",
-    condition:"Excellent",
-    status:"Available",
-    location:"Rack B05",
-    due:""
-  }
-];
-
-
-const inventoryImages = {
-  "CST-00124": "./image/Victorian Tailcoat.jpg",
-  "CST-00125": "./image/Regency Waistcoat.jpg",
-  "CST-00126": "./image/Military Dress Jacket.jpg",
-  "CST-00127": "./image/1920s Evening Dress.jpg",
-  "CST-00128": "./image/Royal Court Cape.jpg",
-  "CST-00129": "./image/Edwardian Blouse.jpg",
-  "CST-00130": "./image/Victorian Lace Gloves.jpg",
-  "CST-00131": "./image/Leather Stage Boots.jpg",
-  "CST-00132": "./image/Royal Velvet Doublet.jpg",
-  "CST-00133": "./image/1950s Circle Skirt.jpg"
-};
-
-inventory.forEach(item => {
-  item.image = inventoryImages[item.id] || "";
-});
-
-
-const bookings = [
-  {
-    id:"HIRE-041",
-    client:"Northbridge Theatre",
-    production:"Hamlet — stage production",
-    status:"On hire",
-    dispatch:"2026-10-22",
-    delivery:"2026-10-23",
-    due:"2026-10-28",
-    count:8,
-    items:["CST-00124","CST-00131"]
-  },
-  {
-    id:"HIRE-042",
-    client:"Silver Screen Productions",
-    production:"The Gilded Age — film",
-    status:"Preparing",
-    dispatch:"2026-10-27",
-    delivery:"2026-10-28",
-    due:"2026-11-03",
-    count:14,
-    items:["CST-00127"]
-  },
-  {
-    id:"HIRE-043",
-    client:"West End Repertory",
-    production:"A Christmas Carol — theatre",
-    status:"Reserved",
-    dispatch:"2026-11-02",
-    delivery:"2026-11-03",
-    due:"2026-11-10",
-    count:6,
-    items:[]
-  }
-];
-
-/* Condition outcomes and workflow actions */
-
-const outcomes = {
-  regular: {
-    label:"Regular cleaning",
-    status:"Cleaning",
-    cls:"good",
-    icon:"✓",
-    action:
-      "Send for routine cleaning. Return the item to available stock only after cleaning and the required checks are complete."
-  },
-
-  additional: {
-    label:"Additional cleaning",
-    status:"Cleaning",
-    cls:"warn",
-    icon:"✦",
-    action:
-      "Send for specialist treatment or stain removal. Keep unavailable until cleaning is signed off."
-  },
-
-  repair: {
-    label:"Repair required",
-    status:"Repair",
-    cls:"warn",
-    icon:"⚒",
-    action:
-      "Move to the repair queue. Keep unavailable until the repair has been completed and approved."
-  },
-
-  unsalvageable: {
-    label:"Unsalvageable",
-    status:"Retired",
-    cls:"bad",
-    icon:"⊘",
-    action:
-      "Quarantine the item and request authorised retirement approval. Do not dispose of it automatically."
-  }
-};
-
-/* Initial sample inspection history */
-
-let inspectionHistory = [
-  {
-    id:"CST-00125",
-    date:"2026-10-24",
-    outcome:"Regular cleaning",
-    notes:"Routine post-hire care",
-    inspector:"Sample staff"
-  },
-  {
-    id:"CST-00126",
-    date:"2026-10-23",
-    outcome:"Repair required",
-    notes:"Cuff stitching needs attention",
-    inspector:"Sample staff"
-  },
-  {
-    id:"CST-00129",
-    date:"2026-10-22",
-    outcome:"Additional cleaning",
-    notes:"Spot treatment recorded",
-    inspector:"Sample staff"
-  }
-];
-
-/* Application state */
-
-let currentPage = "overview";
-let selectedItemId = "CST-00124";
-let selectedCondition = "regular";
-let selectedBookingId = "HIRE-041";
-
-let dispatchChecked = {};
-let dispatchedBookings = new Set();
-
-let tempScanOrigin = "inventory";
-let toastTimer = null;
-
-/* Shared helper functions */
-
-const $ = id => document.getElementById(id);
-
-const esc = value => String(value ?? "").replace(
-  /[&<>"']/g,
-  char => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  }[char])
-);
-
-const itemById = id => inventory.find(item => item.id === id);
-
-const bookingById = id => bookings.find(booking => booking.id === id);
-
-function fmt(date) {
-  if (!date) return "—";
-
-  const parsed = new Date(date + "T12:00:00");
-
-  if (Number.isNaN(parsed.getTime())) return date;
-
-  return parsed.toLocaleDateString("en-GB", {
-    day:"numeric",
-    month:"short",
-    year:"numeric"
-  });
-}
-
-function statusClass(status) {
-  return ({
-    "Available":"b-available",
-    "On hire":"b-hire",
-    "Cleaning":"b-clean",
-    "Repair":"b-repair",
-    "Retired":"b-repair",
-    "Reserved":"b-neutral",
-    "Preparing":"b-clean"
-  })[status] || "b-neutral";
-}
-
-function statusBadge(status) {
-  return `<span class="badge ${statusClass(status)}">${esc(status)}</span>`;
-}
-
-function showToast(message) {
-  const toast = $("toast");
-
-  toast.textContent = message;
-  toast.style.display = "block";
-
-  clearTimeout(toastTimer);
-
-  toastTimer = setTimeout(() => {
-    toast.style.display = "none";
-  }, 2800);
-}
-
-/* End of Section 3.
-   Section 4 adds all navigation and interaction functions. */
-</script>
-
-<script>
-"use strict";
-
-/* WARDBROBEFLOW — SECTION 4A */
-
-/* Navigation */
-
-function navigate(page) {
-  const target = document.getElementById(page);
-  if (!target || !target.classList.contains("page")) return;
-
-  document.querySelectorAll(".page").forEach(p => {
-    p.classList.toggle("active", p.id === page);
-  });
-
-  document.querySelectorAll("[data-nav]").forEach(b => {
-    const active = b.dataset.nav === page;
-    b.classList.toggle("active", active);
-    if (active) b.setAttribute("aria-current", "page");
-    else b.removeAttribute("aria-current");
-  });
-
-  renderPage(page);
-  window.scrollTo({top:0, behavior:"smooth"});
-}
-
-function renderNavigation() {
-  const buttons = NAV.map(n => `
-    <button type="button" class="nav-button"
-      data-nav="${n.id}" onclick="navigate('${n.id}')">
-      <span class="nav-icon">${n.icon}</span>
-      <span>${n.label}</span>
-    </button>
-  `).join("");
-
-  document.getElementById("sideNav").innerHTML = buttons;
-
-  document.getElementById("mobileNav").innerHTML = NAV.map(n => `
-    <button type="button" data-nav="${n.id}"
-      onclick="navigate('${n.id}')">
-      <span>${n.icon}</span><span>${n.label}</span>
-    </button>
-  `).join("");
-}
-
-/* Dashboard */
-
-function renderOverview() {
-  const count = status =>
-    inventory.filter(i => i.status === status).length;
-
-  const available = count("Available");
-  const onHire = count("On hire");
-  const attention =
-    count("Cleaning") + count("Repair") + count("Retired");
-
-  const metrics = [
-    ["👗", inventory.length, "Costume records", "Fictional sample inventory"],
-    ["✅", available, "Available", "Ready for allocation"],
-    ["🚗", onHire, "Currently on hire", "Items away from stock"],
-    ["🧵", attention, "Needs attention", "Cleaning, repair or retirement"]
-  ];
-
-  document.getElementById("metrics").innerHTML =
-    metrics.map(m => `
-      <div class="metric">
-        <div class="metric-icon">${m[0]}</div>
-        <div class="metric-value">${m[1]}</div>
-        <div class="metric-label">${m[2]}</div>
-        <div class="metric-foot">${m[3]}</div>
-      </div>
-    `).join("");
-
-  const priorities = bookings.filter(b =>
-    b.status === "On hire" || b.status === "Preparing"
-  );
-
-  document.getElementById("priorities").innerHTML =
-    priorities.map(b => `
-      <div class="record">
-        <div class="item-icon">🎭</div>
-        <div class="record-main">
-          <div class="record-title">${esc(b.id)} · ${esc(b.client)}</div>
-          <div class="record-meta">${esc(b.production)}</div>
-          <div class="record-meta">Return due ${fmt(b.due)}</div>
-        </div>
-        ${statusBadge(b.status)}
-      </div>
-    `).join("") || `<p class="muted small">No current priorities.</p>`;
-
-  const health = [
-    ["Available", available, "var(--green)"],
-    ["On hire", onHire, "var(--blue)"],
-    ["Cleaning", count("Cleaning"), "#d99b21"],
-    ["Repair", count("Repair"), "var(--red)"],
-    ["Retired", count("Retired"), "#8b2530"]
-  ];
-
-  document.getElementById("health").innerHTML =
-    health.map(h => `
-      <div>
-        <div class="row between small" style="margin-bottom:5px">
-          <span>${h[0]}</span><strong>${h[1]}</strong>
-        </div>
-        <div class="progress">
-          <span style="width:${
-            inventory.length ? h[1] / inventory.length * 100 : 0
-          }%;background:${h[2]}"></span>
-        </div>
-      </div>
-    `).join("");
-
-  document.getElementById("recent").innerHTML =
-    inventory.slice(0,4).map(i => `
-      <div class="record">
-        <img
-  class="item-photo"
-  src="${esc(i.image || '')}"
-  alt="${esc(i.name)}"
-  onerror="this.style.display='none'"
->
-        <div class="record-main">
-          <div class="record-title">${esc(i.name)}</div>
-          <div class="record-meta">${esc(i.id)} · ${esc(i.location)}</div>
-        </div>
-        ${statusBadge(i.status)}
-        <button class="btn sm" onclick="openDetail('${i.id}')">View</button>
-      </div>
-    `).join("");
-}
-
-/* WARDBROBEFLOW — SECTION 4B */
-
-/* INVENTORY */
-
-
-function renderInventory() {
-  const query = (
-    document.getElementById("inventorySearch").value || ""
-  ).trim().toLowerCase();
-
-  const filter = document.getElementById("inventoryFilter").value;
-
-  const results = inventory.filter(i => {
-    const matchesText = [
-      i.id, i.name, i.category, i.size, i.location
-    ].some(v => String(v).toLowerCase().includes(query));
-
-    return matchesText && (filter === "All" || i.status === filter);
-  });
-
-  document.getElementById("inventoryCount").textContent =
-    `${results.length} matching records · ${inventory.length} total sample items`;
-
-  document.getElementById("inventoryList").innerHTML =
-    results.length ? results.map(i => {
-      const canMarkReady =
-        i.status === "Cleaning" || i.status === "Repair";
-
-      return `
-        <div class="inventory-record-group">
-          <div class="record">
-            <img
-              class="item-photo"
-              src="${esc(i.image || '')}"
-              alt="${esc(i.name)}"
-              loading="lazy"
-              onerror="this.style.display='none'"
-            >
-            <div class="record-main">
-              <div class="record-title">${esc(i.name)}</div>
-              <div class="record-meta">
-                ${esc(i.id)} · ${esc(i.category)}
-              </div>
-              <div class="record-meta">
-                Size ${esc(i.size)} · ${esc(i.location)}
-              </div>
-            </div>
-            <div class="record-side">
-              ${statusBadge(i.status)}
-              <button class="btn sm"
-                onclick="openDetail('${i.id}')">Details</button>
-            </div>
-          </div>
-
-          ${canMarkReady ? `
-            <label class="inventory-ready">
-              <input type="checkbox"
-                onchange="markItemReady('${i.id}', this.checked)">
-              <span>Item checked and ready to make available again</span>
-            </label>
-          ` : ""}
-        </div>
-      `;
-    }).join("") :
-    `<div class="card empty">No matching costume records found.</div>`;
-}
-
-function markItemReady(id, checked) {
-  if (!checked) return;
-
-  const item = itemById(id);
-  if (!item) return;
-
-  // Only cleaning or repair items can be released this way.
-  if (!["Cleaning", "Repair"].includes(item.status)) {
-    showToast("This item is not eligible to be marked ready.");
-    renderInventory();
-    return;
-  }
-
-  item.status = "Available";
-  item.location = "Rack — ready for hire";
-  item.due = "";
-
-  renderInventory();
-  renderOverview();
-  renderBookings();
-
-  showToast(`${item.name} is now marked Available.`);
-}
-
-
-/* BOOKINGS */
-
-function renderBookings() {
-  document.getElementById("bookingList").innerHTML =
-    bookings.map(b => `
-      <div class="card">
-        <div class="card-title">
-          <div>
-            <div class="eyebrow">${esc(b.id)}</div>
-            <h3>${esc(b.client)}</h3>
-          </div>
-          ${statusBadge(b.status)}
-        </div>
-
-        <p>${esc(b.production)}</p>
-        <div class="rule"></div>
-
-        <div class="columns">
-          <div>
-            <div class="muted small">Planned dispatch</div>
-            <strong>${fmt(b.dispatch)}</strong>
-          </div>
-          <div>
-            <div class="muted small">Expected delivery</div>
-            <strong>${fmt(b.delivery)}</strong>
-          </div>
-          <div>
-            <div class="muted small">Return due</div>
-            <strong>${fmt(b.due)}</strong>
-          </div>
-          <div>
-            <div class="muted small">Costume items</div>
-            <strong>${b.count}</strong>
-          </div>
-        </div>
-
-        <div class="rule"></div>
-
-        <div class="row" style="flex-wrap:wrap">
-          <button class="btn sm" onclick="selectBooking('${b.id}')">
-            Prepare dispatch
-          </button>
-          <button class="btn sm" onclick="showBookingItems('${b.id}')">
-            View linked items
-          </button>
-        </div>
-
-        <div id="booking-items-${b.id}"
-          class="small muted" style="margin-top:8px"></div>
-      </div>
-    `).join("");
-}
-
-function showBookingItems(id) {
-  const b = bookingById(id);
-  if (!b) return;
-
-  const linked = inventory.filter(i =>
-    b.items.includes(i.id) || i.location === b.id
-  );
-
-  document.getElementById(`booking-items-${id}`).textContent =
-    linked.length
-      ? "Linked items: " + linked.map(i => i.id).join(", ")
-      : "No individual costume IDs allocated yet.";
-}
-
-function selectBooking(id) {
-  selectedBookingId = id;
-  navigate("dispatch");
-
-  document.getElementById("dispatchBooking").value = id;
-  renderDispatch();
-}
-
-/* DISPATCH */
-
-function initDispatch() {
-  document.getElementById("dispatchBooking").innerHTML =
-    bookings.map(b => `
-      <option value="${b.id}">
-        ${esc(b.id)} — ${esc(b.client)}
-      </option>
-    `).join("");
-
-  document.getElementById("dispatchBooking").value = selectedBookingId;
-  renderDispatch();
-}
-
-function getDispatchItems(b) {
-  return inventory.filter(i => b.items.includes(i.id));
-}
-
-function renderDispatch() {
-  const id = document.getElementById("dispatchBooking").value;
-  const b = bookingById(id);
-  if (!b) return;
-
-  selectedBookingId = id;
-
-  const items = getDispatchItems(b);
-  const checked = items.filter(i =>
-    dispatchChecked[`${id}:${i.id}`]
-  ).length;
-
-  document.getElementById("dispatchCount").textContent =
-    `${checked} / ${items.length} checked`;
-
-  document.getElementById("dispatchProgress").style.width =
-    `${items.length ? checked / items.length * 100 : 0}%`;
-
-  document.getElementById("dispatchList").innerHTML =
-    items.length ? items.map(i => `
-      <label class="check-row">
-        <input type="checkbox"
-          ${dispatchChecked[`${id}:${i.id}`] ? "checked" : ""}
-          onchange="toggleDispatchItem('${id}','${i.id}',this.checked)">
-
-        <span class="flex1">
-          <strong>${esc(i.name)}</strong>
-          <span class="record-meta" style="display:block">
-            ${esc(i.id)} · ${esc(i.status)}
-          </span>
-        </span>
-      </label>
-    `).join("") :
-    `<div class="alert warn">
-      No costume IDs allocated yet. Scan or allocate items first.
-    </div>`;
-
-  document.getElementById("dispatchMessage").innerHTML =
-    dispatchedBookings.has(id)
-      ? `<div class="alert good">
-          Simulated dispatch recorded for ${esc(id)}.
-        </div>`
-      : "";
-
-  document.getElementById("dispatchConfirm").disabled =
-    dispatchedBookings.has(id) ||
-    !items.length ||
-    checked !== items.length;
-}
-
-function toggleDispatchItem(bookingId, itemId, checked) {
-  dispatchChecked[`${bookingId}:${itemId}`] = checked;
-  renderDispatch();
-}
-
-function confirmDispatch() {
-  const id = document.getElementById("dispatchBooking").value;
-  const b = bookingById(id);
-  if (!b) return;
-
-  const items = getDispatchItems(b);
-
-  if (!items.length) {
-    showToast("Allocate costume items before dispatch.");
-    return;
-  }
-
-  if (!items.every(i => dispatchChecked[`${id}:${i.id}`])) {
-    showToast("Complete the packing checklist first.");
-    return;
-  }
-
-  const sent = document.getElementById("dispatchDate").value;
-  const delivery = document.getElementById("deliveryDate").value;
-
-  if (!sent || !delivery || delivery < sent) {
-    showToast("Enter valid dispatch and delivery dates.");
-    return;
-  }
-
-  b.dispatch = sent;
-  b.delivery = delivery;
-  b.status = "On hire";
-
-  items.forEach(i => {
-    i.status = "On hire";
-    i.location = b.id;
-    i.due = b.due;
-  });
-
-  dispatchedBookings.add(id);
-
-  renderDispatch();
-  renderBookings();
-  renderOverview();
-
-  showToast("Simulated dispatch recorded.");
-}
-
-/* CONDITION REVIEW */
-
-function initCondition() {
-  document.getElementById("conditionItem").innerHTML =
-    inventory.map(i => `
-      <option value="${i.id}">
-        ${esc(i.id)} — ${esc(i.name)}
-      </option>
-    `).join("");
-
-  document.getElementById("conditionItem").value = selectedItemId;
-
-  loadConditionItem();
-  chooseCondition("regular");
-  renderInspectionHistory();
-}
-
-function loadConditionItem() {
-  const i = itemById(
-    document.getElementById("conditionItem").value
-  );
-
-  if (!i) return;
-
-  selectedItemId = i.id;
-
-  document.getElementById("conditionItemInfo").innerHTML = `
-    <strong>${esc(i.name)}</strong>
-    <div class="small" style="margin-top:4px">
-      Barcode: ${esc(i.id)} · Status: ${esc(i.status)}
-    </div>
-    <div class="small">
-      Location: ${esc(i.location)} · Condition: ${esc(i.condition)}
-    </div>
-  `;
-}
-
-function chooseCondition(key) {
-  if (!outcomes[key]) return;
-
-  selectedCondition = key;
-
-  document.querySelectorAll(".condition-option").forEach(button => {
-    const active = button.dataset.condition === key;
-
-    button.classList.toggle("selected", active);
-    button.setAttribute("aria-pressed", String(active));
-
-    const mark = button.querySelector(".condition-check");
-    if (mark) mark.hidden = !active;
-  });
-
-  const outcome = outcomes[key];
-  const box = document.getElementById("conditionAction");
-
-  box.className = `alert ${outcome.cls}`;
-  box.textContent = outcome.action;
-}
-
-function saveInspection() {
-  const i = itemById(
-    document.getElementById("conditionItem").value
-  );
-
-  if (!i) {
-    showToast("Select a costume first.");
-    return;
-  }
-
-  const date = document.getElementById("conditionDate").value;
-
-  if (!date) {
-    showToast("Enter the inspection date.");
-    return;
-  }
-
-  const outcome = outcomes[selectedCondition];
-
-  inspectionHistory.unshift({
-    id: i.id,
-    date,
-    outcome: outcome.label,
-    notes: document.getElementById("conditionNotes").value.trim(),
-    inspector:
-      document.getElementById("inspector").value.trim() || "Sample staff"
-  });
-
-  i.status = outcome.status;
-  i.condition = outcome.label;
-
-  if (selectedCondition === "unsalvageable") {
-    i.location = "Quarantine — approval required";
-    i.due = "";
-  } else if (selectedCondition === "repair") {
-    i.location = "Workshop";
-    i.due = "";
-  } else if (selectedCondition === "additional") {
-    i.location = "Specialist cleaning";
-    i.due = "";
-  } else {
-    i.location = "Cleaning room";
-    i.due = "";
-  }
-
-  document.getElementById("conditionMessage").innerHTML = `
-    <div class="alert ${outcome.cls}">
-      <strong>Sample inspection recorded</strong>
-      <div style="margin-top:4px">
-        ${esc(i.name)} · ${esc(outcome.label)}
-      </div>
-      <div class="small" style="margin-top:4px">
-        ${esc(outcome.action)}
-      </div>
-    </div>
-  `;
-
-  document.getElementById("conditionNotes").value = "";
-
-  loadConditionItem();
-  renderInspectionHistory();
-  renderInventory();
-  renderOverview();
-  renderBookings();
-
-  showToast("Condition review recorded in demo state.");
-}
-
-function renderInspectionHistory() {
-  document.getElementById("inspectionHistory").innerHTML =
-    inspectionHistory.length
-      ? inspectionHistory.slice(0,10).map(r => `
-          <div class="record">
-            <div class="item-icon">✓</div>
-            <div class="record-main">
-              <div class="record-title">${esc(r.outcome)}</div>
-              <div class="record-meta">
-                ${esc(r.id)} · ${fmt(r.date)}
-              </div>
-              <div class="record-meta">${esc(r.inspector)}</div>
-              ${r.notes
-                ? `<div class="record-meta">${esc(r.notes)}</div>`
-                : ""}
-            </div>
-          </div>
-        `).join("")
-      : `<div class="empty">No inspections recorded.</div>`;
-}
-
-/* WARDBROBEFLOW — SECTION 4C */
-
-/* COSTUME DETAILS */
-
-function openDetail(id) {
-  const i = itemById(id);
-  if (!i) return;
-
-  selectedItemId = id;
-
-  const detailImage = document.getElementById("detailImage");
-
-  detailImage.style.display = i.image ? "block" : "none";
-  detailImage.alt = i.name;
-
-  if (i.image) {
-    detailImage.src = i.image;
-  } else {
-    detailImage.removeAttribute("src");
-  }
-
-  document.getElementById("detailTitle").textContent = i.name;
-  document.getElementById("detailSubtitle").textContent =
-    `${i.id} · ${i.category}`;
-  document.getElementById("detailStatus").innerHTML =
-    statusBadge(i.status);
-
-  const fields = [
-    ["Barcode", i.id],
-    ["Category", i.category],
-    ["Size", i.size],
-    ["Condition", i.condition],
-    ["Current location", i.location],
-    ["Return due", i.due ? fmt(i.due) : "Not applicable"]
-  ];
-
-  document.getElementById("detailInfo").innerHTML =
-    fields.map(([label, value]) => `
-      <div>
-        <div class="muted small">${esc(label)}</div>
-        <strong>${esc(value)}</strong>
-      </div>
-    `).join("");
-
-  const history = inspectionHistory.filter(r => r.id === id);
-
-  document.getElementById("detailHistory").innerHTML =
-    history.length ? history.map(r => `
-      <div class="record">
-        <div class="record-main">
-          <div class="record-title">${esc(r.outcome)}</div>
-          <div class="record-meta">${fmt(r.date)}</div>
-          ${r.notes
-            ? `<div class="record-meta">${esc(r.notes)}</div>`
-            : ""}
-        </div>
-      </div>
-    `).join("") :
-    `<div class="empty">No inspection history for this item.</div>`;
-
-  navigate("detail");
-}
-
-function goInspect() {
-  document.getElementById("conditionItem").value = selectedItemId;
-  loadConditionItem();
-  navigate("condition");
-}
-
-/* SIMULATED BARCODE SCANNING */
-
-function openScanner(origin) {
-  tempScanOrigin = origin;
-
-  document.getElementById("barcodeInput").value = "";
-  document.getElementById("scanResult").innerHTML = "";
-
-  navigate("scanner");
-  document.getElementById("barcodeInput").focus();
-}
-
-function lookupBarcode(event) {
-  event.preventDefault();
-
-  const id = document.getElementById("barcodeInput")
-    .value.trim().toUpperCase();
-
-  const i = itemById(id);
-
-  if (!i) {
-    document.getElementById("scanResult").innerHTML = `
-      <div class="alert bad">
-        No sample costume found for barcode ${esc(id)}.
-        Check the ID and try again.
-      </div>
-    `;
-    return;
-  }
-
-  selectedItemId = i.id;
-
-  document.getElementById("scanResult").innerHTML = `
-    <div class="record">
-      <div class="item-icon">✓</div>
-      <div class="record-main">
-        <div class="record-title">${esc(i.name)}</div>
-        <div class="record-meta">${esc(i.id)}</div>
-        ${statusBadge(i.status)}
-      </div>
-    </div>
-
-    <button class="btn primary full" style="margin-top:12px"
-      onclick="useScannedItem('${i.id}')">
-      Use this costume
-    </button>
-  `;
-}
-
-function useScannedItem(id) {
-  selectedItemId = id;
-
-  if (tempScanOrigin === "condition") {
-    document.getElementById("conditionItem").value = id;
-    loadConditionItem();
-    navigate("condition");
-
-  } else if (tempScanOrigin === "dispatch") {
-    const b = bookingById(selectedBookingId);
-    if (!b) return;
-
-    if (!b.items.includes(id)) {
-      if (b.items.length >= b.count) {
-        showToast("Booking has reached its sample item limit.");
-        return;
-      }
-
-      b.items.push(id);
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f3ec">
+  <meta name="description" content="The Costume Department helps independent costume makers and hire businesses organise costume stock, bookings, dispatch and returns.">
+  <title>The Costume Department — Made for the way costume works</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --paper: #f7f3ec;
+      --white: #fffdf9;
+      --ink: #282c25;
+      --muted: #716f65;
+      --green: #344c3d;
+      --green-dark: #24382c;
+      --rust: #a84f35;
+      --line: #ded8cc;
+      --serif: "Playfair Display", Georgia, serif;
+      --sans: "DM Sans", Arial, sans-serif;
     }
 
-    dispatchChecked[`${b.id}:${id}`] = true;
+    * { box-sizing: border-box; }
 
-    renderDispatch();
-    navigate("dispatch");
+    html { scroll-behavior: smooth; }
 
-    showToast("Sample item added to dispatch checklist.");
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
 
-  } else {
-    openDetail(id);
+    a { color: inherit; }
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 40px));
+      margin-inline: auto;
+    }
+
+    .eyebrow {
+      color: var(--rust);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -.03em;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 37px;
+      height: 37px;
+      border-radius: 50%;
+      background: var(--green);
+      color: white;
+      font-size: 20px;
+    }
+
+    .nav-link {
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 3px;
+    }
+
+    .hero {
+      padding-block: 48px 54px;
+    }
+
+    .hero-grid {
+      display: grid;
+      gap: 30px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 22px;
+      font: 600 clamp(43px, 11vw, 76px)/1.04 var(--serif);
+      letter-spacing: -.055em;
+    }
+
+    h1 em {
+      color: var(--rust);
+      font-weight: 500;
+    }
+
+    .hero-copy {
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 17px;
+      margin-top: 28px;
+    }
+
+    .button {
+      min-height: 52px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 14px 21px;
+      background: var(--green);
+      color: white;
+      border: 1px solid var(--green);
+      border-radius: 3px;
+      font: 700 13px var(--sans);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .2s, transform .2s;
+    }
+
+    .button:hover {
+      background: var(--green-dark);
+      transform: translateY(-1px);
+    }
+
+    .text-link {
+      display: inline-block;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 700;
+      text-underline-offset: 4px;
+    }
+
+    .hero-photo {
+      height: 330px;
+      position: relative;
+      background: #d9c8b2;
+    }
+
+    .photo-note {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      max-width: 215px;
+      padding: 12px 15px;
+      background: var(--white);
+      font: 500 13px/1.5 var(--serif);
+    }
+
+    .photo-note span {
+      display: block;
+      color: var(--muted);
+      font: 10px var(--sans);
+      margin-top: 4px;
+    }
+
+    .trust-strip {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding-block: 17px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: .04em;
+    }
+
+    .trust-strip strong { color: var(--ink); }
+
+    section { padding-block: 68px; }
+
+    .section-heading {
+      max-width: 650px;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      margin-bottom: 13px;
+      font: 600 clamp(32px, 7vw, 49px)/1.12 var(--serif);
+      letter-spacing: -.04em;
+    }
+
+    .section-intro {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .features {
+      display: grid;
+      gap: 12px;
+    }
+
+    .feature {
+      padding: 24px;
+      background: var(--white);
+      border: 1px solid var(--line);
+    }
+
+    .feature-number {
+      color: var(--rust);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+    }
+
+    .feature h3 {
+      margin: 16px 0 9px;
+      font: 600 24px var(--serif);
+    }
+
+    .feature p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      margin-top: 19px;
+      border-radius: 50%;
+      background: #e9eee5;
+      color: var(--green);
+      font-size: 20px;
+    }
+
+    .workflow {
+      background: var(--green);
+      color: white;
+    }
+
+    .workflow .eyebrow { color: #e4b59e; }
+
+    .workflow .section-intro { color: #d6dfd6; }
+
+    .workflow-grid {
+      display: grid;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .workflow-photo {
+      height: 290px;
+      background: #c8b7a1;
+    }
+
+    .steps {
+      list-style: none;
+      padding: 0;
+      margin: 27px 0 0;
+    }
+
+    .steps li {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 12px;
+      padding: 16px 0;
+      border-top: 1px solid #617264;
+    }
+
+    .step-no { color: #e4b59e; font-size: 12px; }
+
+    .steps strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .steps span:last-child {
+      color: #d6dfd6;
+      font-size: 12px;
+    }
+
+    .demo-section { padding-block: 65px; }
+
+    .demo-card {
+      padding: 28px 23px;
+      background: #ece6da;
+      border: 1px solid var(--line);
+    }
+
+    .demo-card h2 { font-size: 36px; }
+
+    .demo-card p {
+      max-width: 540px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .demo-card .button { margin-top: 9px; }
+
+    .signup {
+      padding-block: 68px;
+      background: #e9e1d4;
+    }
+
+    .signup-grid {
+      display: grid;
+      gap: 28px;
+    }
+
+    .signup h2 { font-size: clamp(35px, 8vw, 53px); }
+
+    .signup-copy {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    form { margin-top: 23px; }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    input[type="email"] {
+      width: 100%;
+      min-height: 51px;
+      padding: 13px;
+      border: 1px solid #c7bfb1;
+      border-radius: 2px;
+      background: var(--white);
+      color: var(--ink);
+      font: 14px var(--sans);
+    }
+
+    input:focus-visible, button:focus-visible, a:focus-visible {
+      outline: 3px solid #bb795e;
+      outline-offset: 3px;
+    }
+
+    form .button {
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    .privacy-note {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .thank-you {
+      display: none;
+      margin-top: 20px;
+      padding: 18px;
+      background: var(--white);
+      border-left: 3px solid var(--green);
+      font-size: 14px;
+    }
+
+    .thank-you strong { display: block; margin-bottom: 5px; }
+
+    footer {
+      padding-block: 25px;
+      background: var(--paper);
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-links a { text-underline-offset: 3px; }
+
+    .credits {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.8;
+    }
+
+    .credits a { color: inherit; }
+
+    @media (min-width: 700px) {
+      .wrap { width: min(1120px, calc(100% - 64px)); }
+
+      .hero { padding-block: 78px 80px; }
+
+      .hero-grid {
+        grid-template-columns: 1.05fr .95fr;
+        align-items: center;
+        gap: 55px;
+      }
+
+      .hero-photo { height: 490px; }
+
+      .actions { flex-direction: row; align-items: center; gap: 24px; }
+
+      section { padding-block: 95px; }
+
+      .features { grid-template-columns: repeat(3, 1fr); }
+
+      .feature { padding: 28px; }
+
+      .workflow-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 70px;
+      }
+
+      .workflow-photo { height: 460px; }
+
+      .demo-card { padding: 48px 52px; }
+
+      .signup-grid {
+        grid-template-columns: 1fr .8fr;
+        align-items: start;
+        gap: 80px;
+      }
+
+      .footer-inner {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        transition-duration: .01ms !important;
+      }
+    }
+.pricing {
+  padding-block: 70px;
+  background: #f7f3ec;
+}
+
+.pricing-card {
+  max-width: 590px;
+  margin: 0 auto;
+  padding: 30px 24px;
+  background: #fffdf9;
+  border: 1px solid #ded8cc;
+  border-top: 4px solid #344c3d;
+}
+
+.pricing-card h2 {
+  margin-top: 15px;
+  font-size: clamp(32px, 7vw, 45px);
+}
+
+.pricing-intro {
+  color: #716f65;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.price {
+  margin-top: 25px;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 65px;
+  font-weight: 600;
+  letter-spacing: -3px;
+  line-height: 1.2;
+}
+
+.currency {
+  font-size: 35px;
+  vertical-align: top;
+}
+
+.period {
+  font-family: "DM Sans", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.price-note,
+.pricing-disclaimer {
+  color: #716f65;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.pricing-features {
+  list-style: none;
+  padding: 20px 0;
+  margin: 20px 0;
+  border-top: 1px solid #ded8cc;
+  border-bottom: 1px solid #ded8cc;
+}
+
+.pricing-features li {
+  padding: 9px 0;
+  font-size: 13px;
+}
+
+.pricing-features li::first-letter {
+  color: #344c3d;
+}
+
+.pricing-card .button {
+  width: 100%;
+}
+
+.pricing-disclaimer {
+  margin: 17px 0 0;
+}
+
+@media (min-width: 700px) {
+  .pricing {
+    padding-block: 95px;
+  }
+
+  .pricing-card {
+    padding: 45px;
   }
 }
 
-/* CREATE A BOOKING */
+  </style>
+</head>
 
-function createBooking(event) {
-  event.preventDefault();
-
-  const client = document.getElementById("newClient").value.trim();
-  const production = document.getElementById("newProduction").value.trim();
-  const dispatch = document.getElementById("newDispatch").value;
-  const delivery = document.getElementById("newDelivery").value;
-  const due = document.getElementById("newReturn").value;
-  const count = Number(document.getElementById("newCount").value);
-
-  if (!client || !production || !dispatch || !delivery || !due) {
-    showToast("Complete all required booking fields.");
-    return;
-  }
-
-  if (delivery < dispatch || due < delivery) {
-    showToast("Dates must follow dispatch → delivery → return.");
-    return;
-  }
-
-  if (!Number.isInteger(count) || count < 1 || count > 200) {
-    showToast("Enter a valid item count.");
-    return;
-  }
-
-  const nextNumber = 41 + bookings.length;
-  const id = "HIRE-" + String(nextNumber).padStart(3, "0");
-
-  bookings.push({
-    id,
-    client,
-    production,
-    status: "Reserved",
-    dispatch,
-    delivery,
-    due,
-    count,
-    items: []
-  });
-
-  document.getElementById("newBookingMessage").innerHTML = `
-    <div class="alert good">
-      Sample booking ${esc(id)} created successfully.
-    </div>
-  `;
-
-  document.getElementById("newClient").value = "";
-  document.getElementById("newProduction").value = "";
-  document.getElementById("newCount").value = "4";
-
-  renderBookings();
-  initDispatch();
-  renderOverview();
-
-  showToast("Sample booking created.");
-  navigate("bookings");
-}
-
-/* PAGE REFRESH */
-
-function renderPage(page) {
-  if (page === "overview") renderOverview();
-  if (page === "inventory") renderInventory();
-  if (page === "bookings") renderBookings();
-  if (page === "dispatch") renderDispatch();
-
-  if (page === "condition") {
-    document.getElementById("conditionItem").value = selectedItemId;
-    loadConditionItem();
-    renderInspectionHistory();
-  }
-}
-
-/* START THE APPLICATION */
-
-function initApp() {
-  renderNavigation();
-  renderOverview();
-  renderInventory();
-  renderBookings();
-  initDispatch();
-  initCondition();
-  navigate("overview");
-}
-
-initApp();
-</script>
-
-
+<body>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="#" aria-label="The Costume Department home">
+        <span class="brand-mark" aria-hidden="true">✳</span>
+        <span>The Costume Department</span>
+      </a>
+    <div style="display:flex; align-items:center; gap:18px;">
+  <a class="nav-link" href="#pricing">Pricing</a>
+  <a class="nav-link" href="https://ocellen.github.io/costume5/"
+     target="_blank" rel="noopener noreferrer">Explore the demo ↗</a>
 </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow">For independent costume businesses</p>
+          <h1>More time with the costumes. <em>Less time chasing the details.</em></h1>
+          <p class="hero-copy">
+            Keep your costume stock, hire bookings, dispatch checks and returns
+            organised in one place. Built around the practical work of running
+            an independent costume hire wardrobe.
+          </p>
+          <div class="actions">
+            <a class="button" href="#updates">Get launch updates <span aria-hidden="true">→</span></a>
+            <a class="text-link" href="https://ocellen.github.io/costume5/"
+               target="_blank" rel="noopener noreferrer">Try the interactive demo ↗</a>
+          </div>
+        </div>
+
+        <div class="hero-photo">
+          <img
+            src="https://images.pexels.com/photos/5526307/pexels-photo-5526307.jpeg?auto=compress&cs=tinysrgb&w=1200"
+            alt="Hands working with fabric in a sewing workshop"
+            fetchpriority="high">
+          <div class="photo-note">
+            Made for the work behind every production.
+            <span>Stock · Hire · Dispatch · Returns</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="trust-strip">
+      <div class="wrap">
+        <strong>For the people behind the wardrobe.</strong>
+        &nbsp; Independent hire houses · Costume makers · Small costume teams
+      </div>
+    </div>
+
+    <section>
+      <div class="wrap">
+        <div class="section-heading">
+          <p class="eyebrow">The everyday running of costume</p>
+          <h2>From the stockroom to the next production.</h2>
+          <p class="section-intro">
+            Costumes have a life before, during and after every hire.
+            The demo brings some of the essential admin into one working view.
+          </p>
+        </div>
+
+        <div class="features">
+          <article class="feature">
+            <span class="feature-number">01 / STOCK</span>
+            <div class="feature-icon" aria-hidden="true">♧</div>
+            <h3>Know what you have</h3>
+            <p>
+              Browse individual costume records, search by name or barcode ID,
+              and review stock information in the inventory view.
+            </p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-number">02 / HIRE</span>
+            <div class="feature-icon" aria-hidden="true">▤</div>
+            <h3>Keep hires in view</h3>
+            <p>
+              Record sample bookings with production details, planned dispatch,
+              expected delivery and return dates.
+            </p>
+          </article>
+
+          <article class="feature">
+            <span class="feature-number">03 / RETURNS</span>
+            <div class="feature-icon" aria-hidden="true">✳</div>
+            <h3>Track what comes back</h3>
+            <p>
+              Review an item's condition and record whether it needs routine
+              cleaning, extra treatment, repair or further attention.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="workflow">
+      <div class="wrap workflow-grid">
+        <div class="workflow-photo">
+          <img
+            src="https://images.pexels.com/photos/5894218/pexels-photo-5894218.jpeg?auto=compress&cs=tinysrgb&w=1200"
+            alt="Tailoring equipment and tools arranged in a workroom"
+            loading="lazy">
+        </div>
+
+        <div>
+          <p class="eyebrow">Made for real wardrobe routines</p>
+          <h2>Every costume has a next step.</h2>
+          <p class="section-intro">
+            A hire is more than a booking. Items need to be picked, checked,
+            dispatched, returned and sometimes repaired before they're ready
+            to go out again.
+          </p>
+
+          <ol class="steps">
+            <li>
+              <span class="step-no">01</span>
+              <span>
+                <strong>Find the right item</strong>
+                Search costume records or try the demo's simulated barcode lookup.
+              </span>
+            </li>
+            <li>
+              <span class="step-no">02</span>
+              <span>
+                <strong>Prepare a hire</strong>
+                Review a sample booking and its dispatch checklist.
+              </span>
+            </li>
+            <li>
+              <span class="step-no">03</span>
+              <span>
+                <strong>Review the return</strong>
+                Record the item's condition and the next action it needs.
+              </span>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <div class="wrap">
+        <div class="demo-card">
+          <p class="eyebrow">See it before you sign up</p>
+          <h2>A working prototype. Not just a promise.</h2>
+          <p>
+            Explore the current WardrobeFlow demo, including sample inventory,
+            hire booking forms, dispatch preparation, condition reviews and
+            simulated barcode lookup. All records in the demo are fictional.
+          </p>
+          <p>
+            The Costume Department is the proposed product name.
+            The linked demo is an early prototype, not a claim that a finished
+            commercial service is already available.
+          </p>
+          <a class="button" href="https://ocellen.github.io/costume5/"
+             target="_blank" rel="noopener noreferrer">
+            Explore the demo <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
+<section class="pricing" id="pricing">
+  <div class="wrap">
+    <div class="pricing-card">
+      <p class="eyebrow">Straightforward monthly pricing</p>
+
+      <h2>Your costume department, better organised.</h2>
+
+      <p class="pricing-intro">
+        One practical workspace for independent costume makers and
+        hire businesses to manage stock, bookings, dispatch and returns.
+      </p>
+
+      <div class="price">
+        <span class="currency">€</span>29
+        <span class="period">/ month</span>
+      </div>
+
+      <p class="price-note">
+        Proposed subscription price. Cancel-anytime terms and
+        billing arrangements to be confirmed before launch.
+      </p>
+
+      <ul class="pricing-features">
+        <li>✓ Costume inventory management</li>
+        <li>✓ Hire booking records</li>
+        <li>✓ Dispatch preparation and checklists</li>
+        <li>✓ Returns and condition tracking</li>
+        <li>✓ A workspace designed for independent costume businesses</li>
+      </ul>
+
+      <a class="button" href="https://ocellen.github.io/costume5/"
+         target="_blank" rel="noopener noreferrer">
+        Explore the demo →
+      </a>
+
+      <p class="pricing-disclaimer">
+        The €29 monthly subscription is proposed pricing, not a currently
+        available paid plan. Online payments and subscription management
+        are planned features and are not enabled in the demo.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+    <section class="signup" id="updates">
+      <div class="wrap signup-grid">
+        <div>
+          <p class="eyebrow">Follow the development</p>
+          <h2>Help shape a tool for costume people.</h2>
+          <p class="signup-copy">
+            If you run a costume hire collection or make costumes for
+            productions, follow the development of The Costume Department.
+            Sign up below to see a confirmation message.
+          </p>
+        </div>
+
+        <div>
+          <form id="updates-form">
+            <label for="email">Email address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="you@yourcostumebusiness.com"
+              autocomplete="email"
+              required>
+            <button class="button" type="submit">
+              Register your interest <span aria-hidden="true">→</span>
+            </button>
+            <p class="privacy-note">
+              Prototype form only. Your details are not sent anywhere or
+              saved. This form does not subscribe you to a mailing list.
+            </p>
+          </form>
+
+          <div class="thank-you" id="thank-you" role="status" tabindex="-1">
+            <strong>Thanks for your interest.</strong>
+            This is a local demo confirmation. Nothing has been sent or saved.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-inner">
+        <a class="brand" href="#">
+          <span class="brand-mark" aria-hidden="true">✳</span>
+          <span>The Costume Department</span>
+        </a>
+        <div class="footer-links">
+          <a href="https://ocellen.github.io/costume5/"
+             target="_blank" rel="noopener noreferrer">View the demo</a>
+          <a href="#updates">Register your interest</a>
+        </div>
+        <span>Made for independent costume businesses.</span>
+      </div>
+
+      <div class="credits">
+        Photography:
+        <a href="https://www.pexels.com/photo/woman-sewing-clothes-in-workshop-5526307/"
+           target="_blank" rel="noopener noreferrer">Sewing workshop photo — Pexels</a>
+        ·
+        <a href="https://www.pexels.com/photo/equipment-for-tailoring-5894218/"
+           target="_blank" rel="noopener noreferrer">Tailoring equipment photo — Pexels</a>.
+        Images are used as illustrative stock photography, not as photographs
+        of the product or its customers.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById("updates-form");
+    const thankYou = document.getElementById("thank-you");
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      // Deliberately do not send, store or log the submitted email.
+      form.hidden = true;
+      thankYou.style.display = "block";
+      thankYou.focus();
+    });
+  </script>
 </body>
 </html>
